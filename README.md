@@ -6,7 +6,7 @@ Welcome to the **Dynamic Conquest Simulator** for DCS World, an engaging and imm
 
 ## About the Mission
 
-**Dynamic Conquest Simulator** is an open-ended campaign that lets you experience the intensity of aerial combat and strategic planning. Whether you're piloting a cutting-edge FA-18 Super Hornet or any other aircraft available in your arsenal, your decisions will influence the tide of war in this realistic military simulation.
+**Dynamic Conquest Simulator** is an open-ended campaign that lets you experience the intensity of aerial combat and strategic planning. Whether you're piloting a F/A-18C, Su-27 or any other aircraft available in your arsenal, your decisions will influence the tide of war in this realistic military simulation.
 
 ### Features:
 - **Dynamic Battle Lines**: Watch the front lines shift in real-time based on the outcomes of your missions and those of the AI-controlled forces.
@@ -17,7 +17,7 @@ Welcome to the **Dynamic Conquest Simulator** for DCS World, an engaging and imm
 ## Getting Started
 
 To begin your adventure in the Dynamic Conquest Simulator:
-1. **Install the Mission**: Follow the instructions provided in the installation section to add the mission to your DCS World.
+1. **Install the Mission**: Place the .miz in your Missions folder
 2. **Choose Your Side**: Decide whether you will join the Blue or Red forces.
 3. **Plan Your Strategy**: Use the briefing area to strategize with your team and plan your next moves.
 4. **Fly**: Launch your aircraft, complete objectives, and adapt to the evolving battlefield.
