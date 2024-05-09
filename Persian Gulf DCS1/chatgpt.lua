@@ -179,8 +179,6 @@ local zoneStatus = {}
 
 --------------- Function ZonePainter for Homes ----------------
 
-
-
 local function ZonePainterHome(zone)
     local homecolor
 
@@ -220,10 +218,8 @@ end
 
 
 
-
-
-
 --------------- Function ZonePainter ----------------
+
 local paintedzone = 200
 local textzone = 300
 
@@ -255,7 +251,6 @@ local function ZonePainter(zone)
     textzone = textzone + 1
 end
 
-
 -------------- End ZonePainter -----------------
 
 
@@ -264,6 +259,7 @@ end
 
 
 --------------- Function levelhandler ----------------
+
 local function Levelhandler(zoneName)
     local currentLevelIndex = zoneName.level
     local nextLevelIndex = currentLevelIndex + 1
@@ -294,9 +290,8 @@ end
 
 
 
-
-
 ------------- Function ActivateDefense-------------
+
 function ActivateDefense(zoneName, coalition)
     local groupName = coalition .. "_" .. zoneName
     local group = GROUP:FindByName(groupName)
@@ -306,7 +301,6 @@ function ActivateDefense(zoneName, coalition)
 end
 
 ------------- End ActivateDefense-------------
-
 
 
 
@@ -348,6 +342,9 @@ end
 
 
 
+
+------------------------------- INIT'S ---------------------------------------------------
+
 -------------------------- Init home zones -------------------------------
 
 MESSAGE:New("Init home zones", 15, "INFO"):ToAll()
@@ -365,8 +362,7 @@ end
 
 
 
-
------------ Initialize zones with default settings and draw initial zones ------------
+-------------------------- Init zones -------------------------------
 
 MESSAGE:New("Init rest of  zones", 15, "INFO"):ToAll()
 
@@ -376,7 +372,13 @@ for _, zone in ipairs(zones) do
 end
 
 
---------------------- end init zones-----------------------------
+-------------------------- End Init zones -------------------------------
+
+
+
+
+
+--------------------------- SCHEDULERs --------------------------------
 
 -- Scheduler to check the zone control every 30 seconds
 SCHEDULER:New(nil, UpdateZoneControl, {}, 0, 15)
