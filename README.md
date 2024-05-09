@@ -2,7 +2,7 @@
 
 Welcome to the **Dynamic Conquest Simulator** for DCS World, an engaging and immersive experience set in the strategic and expansive Persian Gulf. Choose your side, Blue or Red, and take part in a dynamic campaign that pushes the limits of your tactical and flying skills.
 
-![FA-18 Super Hornet](https://www.boeing.com/content/theboeingcompany/us/en/defense/fa-18-super-hornet/_jcr_content/root/container_2091943792/hero_teaser.coreimg.jpeg/1702306614430/fa18-super-hornet-new-102621-1280x720.jpeg)
+![FA-18 Super Hornet]([https://www.boeing.com/content/theboeingcompany/us/en/defense/fa-18-super-hornet/_jcr_content/root/container_2091943792/hero_teaser.coreimg.jpeg/1702306614430/fa18-super-hornet-new-102621-1280x720.jpeg](https://images4.alphacoders.com/130/1305510.jpg))
 
 ## About the Mission
 
