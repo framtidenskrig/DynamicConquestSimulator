@@ -4,6 +4,7 @@
 
 MESSAGE:New( "start of Moose Script", 15, "INFO" ):ToAll()
 MESSAGE:New( "Adam är dålig på att förklara", 15, "INFO" ):ToAll()
+MESSAGE:New( "Adam är dålig på att förklara 2", 15, "INFO" ):ToAll()
 
 
 
