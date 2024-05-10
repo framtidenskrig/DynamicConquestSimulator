@@ -361,7 +361,7 @@ local function Levelhandler(zoneName)
     end
 
     for _, zone in ipairs(homeZones) do
-        if zone.name == zoneName then
+        if zone.name == zoneName and zone.coalition ~= "Neutral" then
             zone.xp = zone.xp + 10
             zoneObject = zone
             break
@@ -483,6 +483,8 @@ local function UpdateZone()
 
             if newCoalition ~= zone.coalition then
                 zone.coalition = newCoalition  -- Update coalition directly in the zones array
+                zone.xp = 0
+                zone.level = 0
                 ActivateDefense(zone.name, newCoalition)
             end
 
