@@ -5,6 +5,11 @@
 MESSAGE:New( "start of Moose Script", 15, "INFO" ):ToAll()
 MESSAGE:New( "Adam är dålig på att förklara", 15, "INFO" ):ToAll()
 
+
+
+MESSAGE:New( "test dual commit", 15, "INFO" ):ToAll()
+
+
 ------------------ CAP RED ----------------------
 
 DetectionSetGroup_Red = SET_GROUP:New()
