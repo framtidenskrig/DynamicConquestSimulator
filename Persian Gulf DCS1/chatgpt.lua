@@ -4,6 +4,7 @@
 
 MESSAGE:New( "start of Moose Script", 15, "INFO" ):ToAll()
 
+
 ------------------ CAP RED ----------------------
 
 DetectionSetGroup_Red = SET_GROUP:New()
@@ -33,7 +34,6 @@ CAPZoneE = ZONE:FindByName("CAP Zone E")
 A2ADispatcher_Red:SetSquadronCap( "Bandar-E-Jask", CAPZoneE, 3000, 10000, 400, 800, 700, 1200, "BARO" )
 A2ADispatcher_Red:SetSquadronCapInterval( "Bandar-E-Jask", 1, 60, 600)
 
-
 A2ADispatcher_Red:SetSquadron( "Bandar Abbas", AIRBASE.PersianGulf.Bandar_Abbas_Intl, { "SQ CCCP MID" }, 20 )
 A2ADispatcher_Red:SetSquadronGrouping( "Bandar Abbas", 2 )
 A2ADispatcher_Red:SetSquadronTakeoffFromParkingHot("Bandar Abbas")
@@ -51,12 +51,7 @@ CAPZoneW = ZONE:FindByName("CAP Zone W")
 A2ADispatcher_Red:SetSquadronCap( "Kish", CAPZoneW, 3000, 10000, 400, 800, 700, 1200, "BARO" )
 A2ADispatcher_Red:SetSquadronCapInterval( "Kish", 1, 60, 600)
 
-MESSAGE:New( "CC start", 15, "INFO" ):ToAll()
-do -- Setup the Command Centers
-    RU_CC = COMMANDCENTER:New( GROUP:FindByName( "REDHQ" ), "Russia HQ" )
-    US_CC = COMMANDCENTER:New( GROUP:FindByName( "BLUEHQ" ), "USA HQ" )
-end
-MESSAGE:New( "CC done", 15, "INFO" ):ToAll()
+
 
 -------------------------------------- END CAP RED -----------------------------------------------
 
@@ -119,7 +114,12 @@ A2ADispatcher_Blue:SetSquadronCapInterval("Fujairah", 2, 60, 600)
 -- Additional configurations can be replicated as per the above squadron setup
 
 
-
+MESSAGE:New( "Start CC and Set CAP for defence", 15, "INFO" ):ToAll()
+do -- Setup the Command Centers
+    RU_CC = COMMANDCENTER:New( GROUP:FindByName( "REDHQ" ), "Russia HQ" )
+    US_CC = COMMANDCENTER:New( GROUP:FindByName( "BLUEHQ" ), "USA HQ"  )
+end
+MESSAGE:New( "CC and CAP done", 15, "INFO" ):ToAll()
 
 -------------------------------------- END CAP BLUE -----------------------------------------------
 
@@ -261,28 +261,41 @@ end
 --------------- Function levelhandler ----------------
 
 local function Levelhandler(zoneName)
-    local currentLevelIndex = zoneName.level
+    -- Find the zone object with the specified name
+    local zoneObject = nil
+    for _, zone in ipairs(zones) do
+        if zone.name == zoneName then
+            zoneObject = zone
+            break
+        end
+    end
+
+    if not zoneObject then
+        MESSAGE:New("Zone not found: " .. zoneName, 15, "ERROR"):ToAll()
+        return
+    end
+
+    local currentLevelIndex = zoneObject.level
     local nextLevelIndex = currentLevelIndex + 1
-    zoneName.xp = zoneName.xp + 10
-    
+
     -- Check if there is a next level
     if nextLevelIndex > #zoneLevel then
         return false, "This zone is at the maximum level."  -- No next level available
     end
 
-    local currentXP = zoneName.xp
+    local currentXP = zoneObject.xp
     local nextLevelXP = zoneLevel[nextLevelIndex].xp
     local xptonext = nextLevelXP - currentXP
 
     if currentXP >= nextLevelXP then
-        zoneName.level = nextLevelIndex
-        MESSAGE:New(zoneName .. "leveled up to: Level " .. zoneName.level, 15, "INFO"):ToAll()
+        zoneObject.level = nextLevelIndex
+        MESSAGE:New(zoneName .. " leveled up to: Level " .. zoneObject.level, 15, "INFO"):ToAll()
         return true, "Ready to level up!"
     else
-        MESSAGE:New(zoneName .. " needs " .. xptonext " more XP before leveling up to:  " .. zoneName.level, 15, "INFO"):ToAll()
+        MESSAGE:New(zoneName .. " needs " .. xptonext .. " more XP before leveling up to: Level " .. nextLevelIndex, 15, "INFO"):ToAll()
     end
-
 end
+
 
 --------------- end levelhandler  ----------------
 
@@ -309,28 +322,42 @@ end
 ------------- Function UpdateZoneControl -------------
 
 function UpdateZoneControl()
-    for zoneName, zoneObject in pairs(zones) do
-        MESSAGE:New( "Updating" .. zones.name, 15, "INFO: "):ToAll()
-        Levelhandler(zones)
-        local blueInZone = SET_GROUP:New():FilterCoalitions("blue"):FilterZones({zoneObject}):FilterOnce():Count() > 0
-        local redInZone = SET_GROUP:New():FilterCoalitions("red"):FilterZones({zoneObject}):FilterOnce():Count() > 0
-        local currentCoalition = zoneStatus[zoneName].coalition
-        local newCoalition = nil
+    MESSAGE:New("Updating zones", 15, "INFO"):ToAll()
 
-        if blueInZone and not redInZone then
-            newCoalition = "Blue"
-        elseif redInZone and not blueInZone then
-            newCoalition = "Red"
-        elseif not blueInZone and not redInZone then
-            newCoalition = "Neutral"
-        end
+    for _, zoneData in ipairs(zones) do
+        local zoneObject = ZONE:FindByName(zoneData.name)
 
-        if newCoalition and newCoalition ~= currentCoalition then
-            zoneStatus[zoneName].coalition = newCoalition
-            ActivateDefense(zoneName, newCoalition)
+        if not zoneObject then
+            MESSAGE:New("Zone not found: " .. zoneData.name, 15, "ERROR"):ToAll()
+        else
+            MESSAGE:New("Updating " .. zoneData.name, 15, "INFO"):ToAll()
+
+            local blueInZone = SET_GROUP:New():FilterCoalitions("blue"):FilterZones({zoneObject}):FilterOnce():Count() > 0
+            local redInZone = SET_GROUP:New():FilterCoalitions("red"):FilterZones({zoneObject}):FilterOnce():Count() > 0
+            local currentCoalition = zoneData.coalition
+            local newCoalition = nil
+
+            if blueInZone and not redInZone then
+                newCoalition = "Blue"
+            elseif redInZone and not blueInZone then
+                newCoalition = "Red"
+            elseif not blueInZone and not redInZone then
+                newCoalition = "Neutral"
+            end
+
+            if newCoalition and newCoalition ~= currentCoalition then
+                zoneData.coalition = newCoalition
+                ZonePainter(zoneData)
+                ActivateDefense(zoneData.name, newCoalition)
+            end
+
+            Levelhandler(zoneData.name)
         end
     end
+
+    MESSAGE:New("All zones updated successfully", 15, "INFO"):ToAll()
 end
+
 
 ------------- End UpdateZoneControl -------------
 
