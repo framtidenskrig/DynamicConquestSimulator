@@ -3,7 +3,7 @@
 -- Here we build the network with all the groups that have a name starting with DF CCCP AWACS and DF CCCP EWR.
 
 MESSAGE:New( "start of Moose Script", 15, "INFO" ):ToAll()
-MESSAGE:New( "Adam", 15, "INFO" ):ToAll()
+MESSAGE:New( "Adam är dålig på att förklara", 15, "INFO" ):ToAll()
 
 ------------------ CAP RED ----------------------
 
