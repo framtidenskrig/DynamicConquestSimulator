@@ -314,7 +314,7 @@ end
 
 ------------- Function UpdateZoneControl -------------
 
-function UpdateZoneControl()
+function UpdateZone()
     for zoneName, zoneObject in pairs(zones) do
         MESSAGE:New( "Updating" .. zones.name, 15, "INFO: "):ToAll()
         Levelhandler(zones)
@@ -379,6 +379,6 @@ end
 --------------------- end init zones-----------------------------
 
 -- Scheduler to check the zone control every 30 seconds
-SCHEDULER:New(nil, UpdateZoneControl, {}, 0, 15)
+SCHEDULER:New(nil, UpdateZone, {}, 0, 15)
 
 

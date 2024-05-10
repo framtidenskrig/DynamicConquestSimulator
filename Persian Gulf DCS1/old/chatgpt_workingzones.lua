@@ -144,7 +144,7 @@ function ActivateDefense(zoneName, coalition)
 end
 
 -- Function to check and update zone control
-function UpdateZoneControl()
+function UpdateZone()
     for zoneName, zoneObject in pairs(zoneObjects) do
         MESSAGE:New( "Updating", 15, "INFO: "):ToAll()
         local blueInZone = SET_GROUP:New():FilterCoalitions("blue"):FilterZones({zoneObject}):FilterOnce():Count() > 0
@@ -201,4 +201,4 @@ end
 
 
 -- Scheduler to check the zone control every 30 seconds
-SCHEDULER:New(nil, UpdateZoneControl, {}, 0, 30)
+SCHEDULER:New(nil, UpdateZone, {}, 0, 30)

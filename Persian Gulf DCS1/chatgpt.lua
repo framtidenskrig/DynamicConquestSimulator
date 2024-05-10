@@ -160,7 +160,7 @@ local zoneLevel = {
 local colors = {
     Red = {1, 0, 0, 0.4},   -- Red color with 70% opacity
     Blue = {0, 0, 1, 0.4},  -- Blue color with 70% opacity
-    Green = {0, 1, 0, 0.4} -- Green color with 70% opacity
+    Neutral = {0, 1, 0, 0.4} -- Green color with 70% opacity
 }
 
 local texthome = 1
@@ -178,12 +178,15 @@ local zoneStatus = {}
 
 --------------- Function ZonePainter for Homes ----------------
 
+
 local function ZonePainterHome(zone)
     local zoneObject = ZONE:FindByName(zone.name)
-    if not zoneObject then
+    if not zoneObject then  
         MESSAGE:New("Zone not found: " .. zone.name, 15, "ERROR"):ToAll()
         return
     end
+
+    MESSAGE:New("clearing paint of " .. zone.name, 15, "INFO"):ToAll()
 
     local homecolor
     if zone.coalition == "Blue" then
@@ -203,18 +206,17 @@ local function ZonePainterHome(zone)
     end
 
     -- Draw the circle with the color and unique identifier
-    trigger.action.circleToAll(-1, zone.id_paint, ref.point, ref.radius, {0, 0, 0, .7}, homecolor, 1, true, zone.name)
+    trigger.action.circleToAll(-1, zone.id_paint, ref.point, ref.radius, {0, 0, 0, .7}, homecolor, 1, false, zone.name)
 
     -- Calculate the text position offset based on the zone's name length and radius
     local offset = {x = ref.point.x + ref.radius + 50, y = 0, z = ref.point.z - ((string.len(zone.name)/2) * 5)}
 
     -- Draw the text with the unique identifier
-    trigger.action.textToAll(-1, zone.id_text, offset, {1, 1, 1, 0.7}, {0, 0, 0, .7}, 20, true, zone.name)
+    trigger.action.textToAll(-1, zone.id_text, offset, {1, 1, 1, 0.7}, {0, 0, 0, .7}, 20, false, zone.name .. " - ".. zone.coalition .. " - Level " .. zone.level .. " - XP " .. zone.xp)
 end
 
 
 -------------- End ZonePainter for Homes ------------------
-
 
 
 
@@ -227,6 +229,8 @@ local function ZonePainter(zone)
         MESSAGE:New("Zone not found: " .. zone.name, 15, "ERROR"):ToAll()
         return
     end
+
+    MESSAGE:New("clearing paint of " .. zone.name, 15, "INFO"):ToAll()
 
     local zonecolor
     if zone.coalition == "Blue" then
@@ -246,18 +250,99 @@ local function ZonePainter(zone)
         return
     end
 
-    trigger.action.circleToAll(-1, zone.id_paint, ref.point, ref.radius, {0, 0, 0, .7}, zonecolor, 1, true, zone.name)
+    MESSAGE:New("Putting some " .. zone.coalition .. " on " .. zone.name, 15, "PAINT"):ToAll()
+    trigger.action.circleToAll(-1, zone.id_paint, ref.point, ref.radius, {0, 0, 0, .7}, zonecolor, 1, false, zone.name)
 
     -- Calculate the text position offset based on the zone's name length and radius
+    MESSAGE:New("Putting text on " .. zone.name, 15, "PAINT"):ToAll()
     local offset = {x = ref.point.x + ref.radius + 50, y = 0, z = ref.point.z - ((string.len(zone.name)/2) * 5)}
-    trigger.action.textToAll(-1, zone.id_text, offset, {1, 1, 1, 0.7}, {0, 0, 0, .7}, 20, true, zone.name)
+    trigger.action.textToAll(-1, zone.id_text, offset, {1, 1, 1, 0.7}, {0, 0, 0, .7}, 20, false, zone.name .. " - ".. zone.coalition .. " - Level " .. zone.level .. " - XP " .. zone.xp)
 end
-
-
 
 -------------- End ZonePainter -----------------
 
+--------------- Function ZonePainter ----------------
 
+local function ZoneUpdater(zoneName)
+    -- First check in homeZones
+    for _, zone in ipairs(homeZones) do
+        if zone.name == zoneName then
+            local zoneObject = ZONE:FindByName(zone.name)
+            if not zoneObject then
+                MESSAGE:New("Zone not found: " .. zone.name, 15, "ERROR"):ToAll()
+                return
+            end
+        
+            MESSAGE:New("clearing paint of " .. zone.name, 15, "INFO"):ToAll()
+        
+            local zonecolor
+            if zone.coalition == "Blue" then
+                zonecolor = colors.Blue
+            elseif zone.coalition == "Red" then
+                zonecolor = colors.Red
+            else
+                zonecolor = colors.Neutral
+            end
+        
+            -- Drawing the zone with appropriate color to reflect coalition
+            local ref = trigger.misc.getZone(zone.name)
+            if not ref then
+                MESSAGE:New("Reference zone not found for drawing: " .. zone.name, 15, "ERROR"):ToAll()
+                return
+            end
+        
+            MESSAGE:New("Changing color of " .. zone.coalition .. " on " .. zone.name, 15, "PAINT"):ToAll()
+            trigger.action.setMarkupColorFill(zone.id_paint, zonecolor)
+        
+            -- Calculate the text position offset based on the zone's name length and radius
+            MESSAGE:New("Updating text on " .. zone.name, 15, "PAINT"):ToAll()
+            trigger.action.setMarkUpText(zone.id_text, zone.name .. " - ".. zone.coalition .. " - Level " .. zone.level .. " - XP " .. zone.xp)
+            print("Found " .. zoneName .. " in homeZones")
+            return
+        end
+    end
+
+    -- If not found, check in zones
+    for _, zone in ipairs(zones) do
+        if zone.name == zoneName then
+            local zoneObject = ZONE:FindByName(zone.name)
+            if not zoneObject then
+                MESSAGE:New("Zone not found: " .. zone.name, 15, "ERROR"):ToAll()
+                return
+            end
+        
+            MESSAGE:New("clearing paint of " .. zone.name, 15, "INFO"):ToAll()
+        
+            local zonecolor
+            if zone.coalition == "Blue" then
+                zonecolor = colors.Blue
+            elseif zone.coalition == "Red" then
+                zonecolor = colors.Red
+            else
+                zonecolor = colors.Neutral
+            end
+        
+            -- Drawing the zone with appropriate color to reflect coalition
+            local ref = trigger.misc.getZone(zone.name)
+            if not ref then
+                MESSAGE:New("Reference zone not found for drawing: " .. zone.name, 15, "ERROR"):ToAll()
+                return
+            end
+        
+            MESSAGE:New("Changing color of " .. zone.coalition .. " on " .. zone.name, 15, "PAINT"):ToAll()
+            trigger.action.setMarkupColorFill(zone.id_paint, zonecolor)
+        
+            -- Calculate the text position offset based on the zone's name length and radius
+            MESSAGE:New("Updating text on " .. zone.name, 15, "PAINT"):ToAll()
+            trigger.action.setMarkupText(zone.id_text, zone.name .. " - ".. zone.coalition .. " - Level " .. zone.level .. " - XP " .. zone.xp)
+            print("Found " .. zoneName .. " in zones")
+            return
+        end
+    end
+
+    print(zoneName .. " not found in any zone array")
+end
+-------------- End ZonePainter -----------------
 
 
 
@@ -269,6 +354,15 @@ local function Levelhandler(zoneName)
     local zoneObject = nil
     for _, zone in ipairs(zones) do
         if zone.name == zoneName then
+            zone.xp = zone.xp + 10
+            zoneObject = zone
+            break
+        end
+    end
+
+    for _, zone in ipairs(homeZones) do
+        if zone.name == zoneName then
+            zone.xp = zone.xp + 10
             zoneObject = zone
             break
         end
@@ -323,57 +417,6 @@ end
 
 
 
-------------- Function UpdateZoneControl -------------
-
-function UpdateZoneControl()
-    MESSAGE:New("Updating zones", 15, "INFO"):ToAll()
-
-    for _, zoneData in ipairs(zones) do
-        local zoneObject = ZONE:FindByName(zoneData.name)
-
-        if not zoneObject then
-            MESSAGE:New("Zone not found: " .. zoneData.name, 15, "ERROR"):ToAll()
-        else
-            MESSAGE:New("Updating " .. zoneData.name, 15, "INFO"):ToAll()
-
-            local blueInZone = SET_GROUP:New():FilterCoalitions("blue"):FilterZones({zoneObject}):FilterOnce():Count() > 0
-            local redInZone = SET_GROUP:New():FilterCoalitions("red"):FilterZones({zoneObject}):FilterOnce():Count() > 0
-            local currentCoalition = zoneData.coalition
-            local newCoalition = nil
-
-            if blueInZone and not redInZone then
-                newCoalition = "Blue"
-            elseif redInZone and not blueInZone then
-                newCoalition = "Red"
-            elseif not blueInZone and not redInZone then
-                newCoalition = "Neutral"
-            end
-
-            if newCoalition and newCoalition ~= currentCoalition then
-                zoneData.coalition = newCoalition
-                ZonePainter(zoneData)
-                ActivateDefense(zoneData.name, newCoalition)
-            end
-
-            Levelhandler(zoneData.name)
-        end
-    end
-
-    MESSAGE:New("All zones updated successfully", 15, "INFO"):ToAll()
-end
-
-
-------------- End UpdateZoneControl -------------
-
-
-
-
-
-
-
-
-
-
 ------------------------------- INIT'S ---------------------------------------------------
 
 -------------------------- Init home zones -------------------------------
@@ -388,8 +431,6 @@ end
 MESSAGE:New("All home zones init'd", 15, "INFO"):ToAll()
 
 --------------------- End Init home zones -------------------------
-
-
 
 
 
@@ -410,9 +451,64 @@ MESSAGE:New("Rest of zones init'd", 15, "INFO"):ToAll()
 
 
 
+
+
+------------- Function UpdateZone -------------
+
+
+local function UpdateZone()
+    MESSAGE:New("Updating zones", 15, "INFO"):ToAll()
+
+    for _, zone in ipairs(zones) do
+        MESSAGE:New("Updating " .. zone.name, 15, "INFO"):ToAll()
+        local zoneObject = ZONE:FindByName(zone.name)
+        if not zoneObject then
+            MESSAGE:New("Zone not found: " .. zone.name, 15, "ERROR"):ToAll()  -- Use zone.name instead of zoneObject.name
+        else
+            MESSAGE:New("We found " .. zone.name .. " and its " .. zone.coalition, 15, "INFO"):ToAll()  -- Use zone.name here directly
+            local blueInZone = SET_GROUP:New():FilterCoalitions("blue"):FilterZones({zoneObject}):FilterOnce():Count() > 0
+            local redInZone = SET_GROUP:New():FilterCoalitions("red"):FilterZones({zoneObject}):FilterOnce():Count() > 0
+            local newCoalition
+            MESSAGE:New("We filtered " .. zone.name, 15, "INFO"):ToAll()
+
+            if blueInZone and not redInZone then
+                newCoalition = "Blue"
+            elseif redInZone and not blueInZone then
+                newCoalition = "Red"
+            else
+                newCoalition = "Neutral"
+            end
+
+            MESSAGE:New(zone.name .. " is " .. newCoalition, 15, "INFO"):ToAll()
+
+            if newCoalition ~= zone.coalition then
+                zone.coalition = newCoalition  -- Update coalition directly in the zones array
+                ActivateDefense(zone.name, newCoalition)
+            end
+
+            MESSAGE:New("Handling level of " .. zone.name, 15, "INFO"):ToAll()
+            Levelhandler(zone.name)
+
+            MESSAGE:New("Repainting " .. zone.name, 15, "INFO"):ToAll()
+            ZoneUpdater(zone.name)  -- Make sure to pass zone.name if ZoneUpdater expects a string
+        end
+    end
+
+    MESSAGE:New("All zones updated successfully", 15, "INFO"):ToAll()
+end
+
+
+
+------------- End UpdateZone -------------
+
+
+
+
+
+
 --------------------------- SCHEDULERs --------------------------------
 
 -- Scheduler to check the zone control every 30 seconds
-SCHEDULER:New(nil, UpdateZoneControl, {}, 0, 15)
+SCHEDULER:New(nil, UpdateZone, {}, 15, 30)
 
 

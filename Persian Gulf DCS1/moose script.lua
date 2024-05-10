@@ -226,7 +226,7 @@ end
 
 
 -- Function to check and update zone control and send messages
-function UpdateZoneControl()
+function UpdateZone()
     MESSAGE:New( "UPDATING ZONE CONTROLS ", 15, "INFO" ):ToAll()
     for zoneName, zoneObject in pairs(zoneObjects) do
         MESSAGE:New("232323", 15, "INFO"):ToAll()
@@ -279,7 +279,7 @@ function UpdateZoneControl()
 end
 
 -- Scheduler to check the zone control every 30 seconds
-local checkScheduler = SCHEDULER:New(nil, UpdateZoneControl, {}, 0, 30)
+local checkScheduler = SCHEDULER:New(nil, UpdateZone, {}, 0, 30)
 if not checkScheduler then
     MESSAGE:New("Failed to create scheduler for zone control checks.", 15, "Error"):ToAll()
 end
