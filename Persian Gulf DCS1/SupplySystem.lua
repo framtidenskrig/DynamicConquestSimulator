@@ -4,31 +4,31 @@ BlueSupplyPoints = 100
 RedSupplyPoints = 100
 
 local loadingZoneA = ZONE:New("LoadingZoneA")
-local loadingZoneB = ZONE:New("LoadingZoneB")
+--local loadingZoneB = ZONE:New("LoadingZoneB")
 local unloadingZoneA = ZONE:New("UnloadingZoneA")
-local unloadingZoneB = ZONE:New("UnloadingZoneB")
+--local unloadingZoneB = ZONE:New("UnloadingZoneB")
 
-local convoyBlueGroupA = {
-    name = "Blue Supply Convoy A",
+Spawn_Blue_Supply_Chinook_A = SPAWN
+        :New("Blue Supply Chinook A")
+        :InitLimit( 2, 0 )
+        :SpawnScheduled( 0, 0 )
+
+local Blue_Supply_Chinook_A = {s
+    name = "Blue Supply Chinook A",
     unitLoadingZone = loadingZoneA,
     unitUnloadingZone = unloadingZoneA,
-    loadStatus = "unloaded"
-}
-
-local convoyBlueGroupB = {
-    name = "Blue Supply Convoy B",
-    unitLoadingZone = loadingZoneB,
-    unitUnloadingZone = unloadingZoneB,
-    loadStatus = "unloaded"
+    loadStatus = "unloaded",
+    loadCapacity = 10850 -- kg
 }
 
 local convoyBlueList = {
-    convoyBlueGroupA, convoyBlueGroupB
+    Blue_Supply_Chinook_A
 }
 
 local function CheckUnitCountInConvoy(convoyObj)
     local convoyGroup = GROUP:FindByName(convoyObj.name)
     local count = convoyGroup:GetSize()
+    MESSAGE:New("The size of " .. convoyObj.name .. ": " .. count, 5):ToAll()
     return count
 end
 
@@ -47,44 +47,44 @@ end
 local function CheckConvoyInLoadingZone(convoyObj, zoneName)
     local convoyGroup = GROUP:FindByName(convoyObj.name)
     if convoyGroup and convoyGroup:IsAlive() and convoyObj.loadStatus == "unloaded" then
-        if convoyGroup:IsPartlyInZone(zoneName) then
+        if convoyGroup:IsPartlyOrCompletelyInZone(zoneName) then
             MESSAGE:New(convoyObj.name .. " has loaded supplies.", 5):ToAll()
             convoyObj.loadStatus = "loaded"
         else
-            --MESSAGE:New("Convoy is not in loading zone", 5):ToAll()
+            MESSAGE:New(convoyObj.name .. " is not in loading zone", 5):ToAll()
         end
     else
-        --MESSAGE:New("Could not find any matching group. A", 5):ToAll()
+        MESSAGE:New("Could not find any matching group. (loading)", 5):ToAll()
     end
 end
 
 local function CheckConvoyInUnloadingZone(convoyObj, zoneName)
     local convoyGroup = GROUP:FindByName(convoyObj.name)
     if convoyGroup and convoyGroup:IsAlive() and convoyObj.loadStatus == "loaded" then
-        if convoyGroup:IsPartlyInZone(zoneName) then
+        if convoyGroup:IsPartlyOrCompletelyInZone(zoneName) then
             local units_alive = CheckUnitCountInConvoy(convoyObj)
-            local supplyPointsToAdd = units_alive * 10
-            MESSAGE:New(convoyObj.name .. " has delivered " .. units_alive .."x supplies.", 5):ToAll()
+            local supplyPointsToAdd = (units_alive * convoyObj.loadCapacity) / 1000
+            MESSAGE:New(convoyObj.name .. " has delivered " .. supplyPointsToAdd .. " supplies.", 5):ToAll()
 
             if convoyGroup:GetCoalition() == coalition.side.BLUE then
-                AddSupplyPoints("blue", supplyPointsToAdd) -- Example action
+                AddSupplyPoints("blue", supplyPointsToAdd)
             else
-                AddSupplyPoints("red", supplyPointsToAdd) -- Example action
+                AddSupplyPoints("red", supplyPointsToAdd)
             end
             convoyObj.loadStatus = "unloaded"
         else
-            --MESSAGE:New("Convoy is not in unloading zone", 5):ToAll()
+            MESSAGE:New("Convoy is not in unloading zone", 5):ToAll()
         end
     else
-        --MESSAGE:New("Could not find any matching group. B", 5):ToAll()
+        MESSAGE:New("Could not find any matching group. (unloading)", 5):ToAll()
     end
 end
 
 local function scheduler()
     --MESSAGE:New("Scheduler OK START", 5):ToAll()
-    for _, convoy in pairs(convoyBlueList) do
-        CheckConvoyInLoadingZone(convoy, convoy.unitLoadingZone)
-        CheckConvoyInUnloadingZone(convoy, convoy.unitUnloadingZone)
+    for _, convoyObj in pairs(convoyBlueList) do
+        CheckConvoyInLoadingZone(convoyObj, convoyObj.unitLoadingZone)
+        CheckConvoyInUnloadingZone(convoyObj, convoyObj.unitUnloadingZone)
     end
     timer.scheduleFunction(scheduler, {}, timer.getTime() + 5)
     --MESSAGE:New("Scheduler OK END", 5):ToAll()
