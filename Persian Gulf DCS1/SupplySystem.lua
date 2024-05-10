@@ -4,26 +4,38 @@ BlueSupplyPoints = 100
 RedSupplyPoints = 100
 
 local loadingZoneA = ZONE:New("LoadingZoneA")
---local loadingZoneB = ZONE:New("LoadingZoneB")
+local loadingZoneA_coordinates = loadingZoneA:GetCoordinate()
+
 local unloadingZoneA = ZONE:New("UnloadingZoneA")
---local unloadingZoneB = ZONE:New("UnloadingZoneB")
+local unloadingZoneA_coordinates = unloadingZoneA:GetCoordinate()
 
-Spawn_Blue_Supply_Chinook_A = SPAWN
-        :New("Blue Supply Chinook A")
-        :InitLimit( 2, 0 )
-        :SpawnScheduled( 0, 0 )
-
-local Blue_Supply_Chinook_A = {s
-    name = "Blue Supply Chinook A",
-    unitLoadingZone = loadingZoneA,
-    unitUnloadingZone = unloadingZoneA,
-    loadStatus = "unloaded",
-    loadCapacity = 10850 -- kg
+local ZoneA_coordinates = {
+    loadingZoneA_coordinates, unloadingZoneA_coordinates
 }
 
-local convoyBlueList = {
-    Blue_Supply_Chinook_A
-}
+local convoyBlueList = {}
+
+local Spawn_Blue_Supply_Chinook_A = SPAWN
+    :New("Blue Supply Chinook A")
+    :InitLimit( 2, 0 )
+    :SpawnScheduled( 0, 0 )
+
+Spawn_Blue_Supply_Chinook_A:OnSpawnGroup(
+        function(grp)
+            local groupName = grp:GetName()
+            MESSAGE:New("Group Spawned: " .. grp:GetName(), 15):ToAll()
+
+            convoyBlueList[groupName] = {
+                name = groupName,
+                unitLoadingZone = loadingZoneA,
+                unitUnloadingZone = unloadingZoneA,
+                loadStatus = "unloaded",
+                loadCapacity = 10850, -- kg
+                maxSpeed = 82 -- m/s
+            }
+            grp:PatrolRaceTrack(loadingZoneA_coordinates, unloadingZoneA_coordinates, 650, 300, 589826, false) -- 589826 --> https://wiki.hoggitworld.com/view/DCS_option_formation
+        end
+      )
 
 local function CheckUnitCountInConvoy(convoyObj)
     local convoyGroup = GROUP:FindByName(convoyObj.name)
@@ -86,7 +98,7 @@ local function scheduler()
         CheckConvoyInLoadingZone(convoyObj, convoyObj.unitLoadingZone)
         CheckConvoyInUnloadingZone(convoyObj, convoyObj.unitUnloadingZone)
     end
-    timer.scheduleFunction(scheduler, {}, timer.getTime() + 5)
+    timer.scheduleFunction(scheduler, {}, timer.getTime() + 6)
     --MESSAGE:New("Scheduler OK END", 5):ToAll()
 end
 
